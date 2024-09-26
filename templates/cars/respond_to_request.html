@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Respond to Request</title>
+</head>
+<body>
+    <h2>Respond to Ride Request</h2>
+    <p>Pickup Location: {{ ride.pickup_location }}</p>
+    <p>Destination: {{ ride.destination }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Accept Request</button>
+    </form>
+    <a href="{% url 'create_payment' ride.id %}">Pay for Ride</a>
+</body>
+</html>

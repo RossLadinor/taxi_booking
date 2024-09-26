@@ -1,0 +1,160 @@
+{% extends "pages/base.html" %} {% block content %}
+<h2>Request a Ride</h2>
+<div id="map" style="height: 500px; width: 100%"></div>
+<!-- Modal Structure -->
+<button
+  id="requestRideButton"
+  type="submit"
+  onclick="submitRideRequest()"
+  disabled
+>
+  Request Ride
+</button>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let userLocation;
+    let destination;
+    let sourceCoords;
+    let destCoords;
+
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoiYS1ib3J1IiwiYSI6ImNsa2p5MHllcTBiZjcza284ZjUxaGgyczEifQ.8IbGLnlmjYUDxZgryrH8Zw";
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [145, -37.8],
+      zoom: 10,
+      minZoom: 10,
+    }).on("renderstart", () => {
+      map.getCanvas().style.cursor = "default";
+    });
+
+    const destinationGeocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+      type: "address",
+      placeholder: "Enter your destination",
+    }).on("result", function (result) {
+      destCoords = result.result.center;
+      destination = result.result.place_name;
+      document.getElementById("requestRideButton").disabled = false;
+      // console.log(userLocation);
+
+      axios
+        .get(
+          `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${sourceCoords};${destCoords}?access_token=${mapboxgl.accessToken}`
+        )
+        .then((response) => {
+          const route = response.data.routes[0];
+          document.getElementById("rideDistance").innerText =
+            (route.distance / 10000).toFixed(2) + " km";
+          document.getElementById("rideETA").innerText =
+            Math.round(route.duration / 600) + " mins";
+          document.getElementById("ridePrice").innerText =
+            "$" + ((route.distance / 10000) * 1.5).toFixed(2);
+        })
+        .catch((error) => {
+          console.error("Error fetching directions data:", error);
+        });
+
+      // create the popup
+      const popupHTML = `
+      <div>
+        <h3>Ride from ${userLocation} to ${destination}</h3>
+        <p>
+          Ride distance: <span id="rideDistance"></span><br>
+          ETA: <span id="rideETA"></span><br>
+          Price: <span id="ridePrice"></span>
+        </p>
+      </div>
+      </div>
+    `;
+
+      // create DOM element for the marker
+      const el = document.createElement("div");
+      el.ariaLabel = "Map marker";
+
+      // create the marker
+      new mapboxgl.Marker(el)
+        .setLngLat(result.result.center)
+        .setPopup(
+          new mapboxgl.Popup({
+            anchor: "bottom",
+            closeOnClick: false,
+            closeButton: false,
+          }).setHTML(popupHTML)
+        ) // sets a popup on this marker
+        .addTo(map)
+        .togglePopup();
+    });
+
+    const sourceGeocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+      placeholder: "Enter Pickup Address",
+      flyTo: false,
+    }).on("result", function (result) {
+      geolocate.sourceCoords = result.result.center;
+      userLocation = result.result.place_name;
+    });
+
+    map.addControl(sourceGeocoder, "top-left");
+    map.addControl(destinationGeocoder, "top-left");
+
+    var geolocate = new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+      trackUserLocation: true,
+      showUserHeading: true,
+    });
+
+    map.addControl(geolocate);
+    map.on("load", function () {
+      geolocate.trigger();
+    });
+
+    geolocate.on("geolocate", (position) => {
+      axios
+        .get(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${position.coords.longitude},${position.coords.latitude}.json?access_token=${mapboxgl.accessToken}`
+        )
+        .then((response) => {
+          userLocation = response.data.features[0].place_name;
+          sourceCoords = response.data.features[3].center;
+          sourceGeocoder.setPlaceholder(userLocation);
+        })
+        .catch((error) => {
+          console.error("Error fetching geolocation data:", error);
+        });
+    });
+
+    window.submitRideRequest = function () {
+      const data = {
+        pickup: userLocation,
+        destination: destination,
+      };
+      console.log(data);
+
+      fetch("{% url 'save_ride_data' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            alert("Ride request submitted successfully!");
+          } else {
+            alert("Error: " + data.message);
+          }
+        });
+    };
+  });
+</script>
+{% endblock %}

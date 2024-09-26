@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block title %}
+    <title>Taxi Booking</title>
+    {% endblock %} {% load static %}
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'styles/main.css' %}"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
+    <!-- Load the `mapbox-gl-geocoder` plugin. -->
+    <script
+      id="geocoder-js"
+      src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"
+    ></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Taxi Booking System</h1>
+      <nav>
+        <ul>
+          <li><a href="{% url 'home' %}">Home</a></li>
+          {% if not user.is_authenticated %}
+          <li><a href="{% url 'register' %}">Register</a></li>
+          {% endif %}
+          <li><a href="{% url 'request_ride' %}">Request a Ride</a></li>
+          <li><a href="{% url 'view_requests' %}">View Requests</a></li>
+          {% if not user.is_authenticated %}
+          <li><a href="{% url 'login' %}">Login</a></li>
+          {% endif %}
+          <li style="float: right">
+            <a href="{% url 'profile' %}">{{ user.username }}</a>
+          </li>
+          <li><a href="{% url 'support' %}">Help Center</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>{% block content %}{% endblock %}</main>
+  </body>
+</html>
