@@ -65,8 +65,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'taxi_booking.urls'
 
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, '')
 
 STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
 STATIC_URL = '/static/'
