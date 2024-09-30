@@ -31,7 +31,8 @@ SECRET_KEY = 'django-insecure-13nmmav^((-aq9^wj32q_#4k4zg%bzy0i!a#outrp2*#z&5lb7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['taxibooking-a3h4hzdabcfdetc0.australiacentral-01.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = ['https://taxibooking-a3h4hzdabcfdetc0.australiacentral-01.azurewebsites.net']
 
 
 # Application definition
