@@ -24,3 +24,7 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('cars/', include('cars.urls')),
 ]
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^includes/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/static/styles/'}),
+    )
