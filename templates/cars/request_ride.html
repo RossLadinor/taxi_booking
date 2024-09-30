@@ -49,11 +49,11 @@
         .then((response) => {
           const route = response.data.routes[0];
           document.getElementById("rideDistance").innerText =
-            (route.distance / 10000).toFixed(2) + " km";
+            (route.distance / 1000).toFixed(2) + " km";
           document.getElementById("rideETA").innerText =
-            Math.round(route.duration / 600) + " mins";
+            Math.round(route.duration / 60) + " mins";
           document.getElementById("ridePrice").innerText =
-            "$" + ((route.distance / 10000) * 1.5).toFixed(2);
+            "$" + ((route.distance / 1000) * 1.9).toFixed(2);
         })
         .catch((error) => {
           console.error("Error fetching directions data:", error);
@@ -123,7 +123,7 @@
         )
         .then((response) => {
           userLocation = response.data.features[0].place_name;
-          sourceCoords = response.data.features[3].center;
+          sourceCoords = response.data.features[0].center;
           sourceGeocoder.setPlaceholder(userLocation);
         })
         .catch((error) => {
