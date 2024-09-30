@@ -24,7 +24,12 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('cars/', include('cars.urls')),
 ]
+
+from django.conf import settings
+
 if settings.DEBUG:
-    urlpatterns += patterns('',
-        (r'^includes/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/static/styles/'}),
-    )
+    urlpatterns += patterns(
+        'django.views.static',
+        (r'media/(?P<path>.*)',
+        'serve',
+        {'document_root': settings.MEDIA_ROOT}), )
