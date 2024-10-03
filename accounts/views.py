@@ -47,4 +47,4 @@ def profile(request):
 @login_required
 def logout_view(request):
     logout(request)
-    return redirect('home')  # Redirect to the homepage or another view after logout
+    return redirect('home')  # Redirect to the homepage or another view after logout test
